@@ -1,4 +1,4 @@
-# Run A Ride - Auto Rickshaw Booking Platform with Razorpay Payment Integration
+# Run A Ride - Auto Rickshaw Booking Platform 
 
 A complete ride-booking platform similar to Uber, focused on auto-rickshaws and affordable rides in rural and semi-urban areas. Features secure online payments via Razorpay.
 
