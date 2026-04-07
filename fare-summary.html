@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fare Summary - Run A Ride</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <div class="back-home">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+  <div class="booking-container">
+    <div class="fare-summary-card">
+      <div class="summary-header">
+        <h1><i class="fas fa-receipt"></i> Fare Summary</h1>
+        <p>Review your ride details before proceeding</p>
+      </div>
+
+      <!-- Ride Details -->
+      <div class="summary-section">
+        <h3><i class="fas fa-route"></i> Journey Details</h3>
+        <div class="detail-row">
+          <span class="detail-icon"><i class="fas fa-circle-dot"></i></span>
+          <div class="detail-content">
+            <span class="detail-label">Pickup Location</span>
+            <span class="detail-value" id="summaryPickup">-</span>
+          </div>
+        </div>
+        <div class="detail-row">
+          <span class="detail-icon"><i class="fas fa-square-full"></i></span>
+          <div class="detail-content">
+            <span class="detail-label">Drop Location</span>
+            <span class="detail-value" id="summaryDrop">-</span>
+          </div>
+        </div>
+        <div class="detail-row">
+          <span class="detail-icon"><i class="fas fa-car-side"></i></span>
+          <div class="detail-content">
+            <span class="detail-label">Ride Type</span>
+            <span class="detail-value" id="summaryRideType">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trip Info -->
+      <div class="summary-section">
+        <h3><i class="fas fa-info-circle"></i> Trip Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <i class="fas fa-road"></i>
+            <span class="info-item-label">Distance</span>
+            <span class="info-item-value" id="summaryDistance">0 km</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-clock"></i>
+            <span class="info-item-label">Duration</span>
+            <span class="info-item-value" id="summaryDuration">0 mins</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fare Breakdown -->
+      <div class="summary-section fare-breakdown">
+        <h3><i class="fas fa-rupee-sign"></i> Fare Breakdown</h3>
+        <div class="breakdown-row">
+          <span>Base Fare</span>
+          <span id="summaryBaseFare">₹0</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Distance Fare (<span id="summaryDistanceKm">0</span> km)</span>
+          <span id="summaryDistanceFare">₹0</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Taxes & Charges (5%)</span>
+          <span id="summaryTaxes">₹0</span>
+        </div>
+        <div class="breakdown-row total-row">
+          <span>Total Amount</span>
+          <span id="summaryTotal">₹0</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="summary-actions">
+        <button type="button" class="btn-outline full-width" onclick="window.location.href='book-ride.html'">
+          <i class="fas fa-edit"></i> Modify Ride
+        </button>
+        <button type="button" class="btn-primary full-width" id="proceedToPaymentBtn">
+          <i class="fas fa-lock"></i> Proceed to Payment
+        </button>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="trust-badges">
+        <div class="badge">
+          <i class="fas fa-shield-alt"></i>
+          <span>Secure Payment</span>
+        </div>
+        <div class="badge">
+          <i class="fas fa-check-circle"></i>
+          <span>Best Price Guarantee</span>
+        </div>
+        <div class="badge">
+          <i class="fas fa-headset"></i>
+          <span>24/7 Support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="booking.js"></script>
+  <script>
+    // Load ride details from localStorage and display
+    document.addEventListener('DOMContentLoaded', function() {
+      const rideDetails = JSON.parse(localStorage.getItem('currentRide'));
+      
+      if (!rideDetails) {
+        alert('No ride details found. Please book a ride first.');
+        window.location.href = 'book-ride.html';
+        return;
+      }
+
+      // Display ride details
+      document.getElementById('summaryPickup').textContent = rideDetails.pickupLocation;
+      document.getElementById('summaryDrop').textContent = rideDetails.dropLocation;
+      document.getElementById('summaryRideType').textContent = rideDetails.rideType.toUpperCase();
+      document.getElementById('summaryDistance').textContent = rideDetails.distance + ' km';
+      document.getElementById('summaryDuration').textContent = Math.round(rideDetails.duration || 0) + ' mins';
+      document.getElementById('summaryDistanceKm').textContent = rideDetails.distance;
+      
+      // Display fare breakdown
+      document.getElementById('summaryBaseFare').textContent = '₹' + rideDetails.baseFare;
+      document.getElementById('summaryDistanceFare').textContent = '₹' + rideDetails.distanceFare;
+      document.getElementById('summaryTaxes').textContent = '₹' + rideDetails.taxes;
+      document.getElementById('summaryTotal').textContent = '₹' + rideDetails.totalAmount;
+
+      // Proceed to payment button handler
+      document.getElementById('proceedToPaymentBtn').addEventListener('click', function() {
+        // Store ride details for payment page
+        localStorage.setItem('paymentRide', JSON.stringify(rideDetails));
+        window.location.href = 'payment.html';
+      });
+    });
+  </script>
+</body>
+</html>

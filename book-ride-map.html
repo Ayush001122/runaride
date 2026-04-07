@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Ride - Interactive Map - Run A Ride</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <style>
+    .booking-container {
+      max-width: 1200px;
+      padding: 80px 20px 40px;
+    }
+    
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .map-panel {
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 183, 3, 0.2);
+    }
+    
+    #map {
+      height: 500px;
+      width: 100%;
+      z-index: 1;
+    }
+    
+    .form-panel {
+      background: rgba(30, 30, 30, 0.8);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 30px;
+      border: 1px solid rgba(255, 183, 3, 0.2);
+    }
+    
+    .location-input-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    
+    .location-input-group::before {
+      content: '';
+      position: absolute;
+      left: 45px;
+      top: 50px;
+      width: 2px;
+      height: 30px;
+      background: linear-gradient(to bottom, #ffb703, transparent);
+      z-index: 1;
+    }
+    
+    .geolocate-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 183, 3, 0.2);
+      border: none;
+      color: #ffb703;
+      width: 35px;
+      height: 35px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .geolocate-btn:hover {
+      background: rgba(255, 183, 3, 0.4);
+    }
+    
+    .trip-details-box {
+      background: rgba(255, 183, 3, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+    
+    .trip-stat {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px 0;
+    }
+    
+    .trip-stat i {
+      font-size: 20px;
+      color: #ffb703;
+      width: 25px;
+    }
+    
+    .stat-label {
+      color: #aaaaaa;
+      font-size: 13px;
+    }
+    
+    .stat-value {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .fare-display {
+      background: rgba(255, 183, 3, 0.15);
+      border: 2px solid rgba(255, 183, 3, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .fare-label {
+      display: block;
+      color: #aaaaaa;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .fare-amount {
+      display: block;
+      color: #ffb703;
+      font-size: 36px;
+      font-weight: 700;
+    }
+    
+    .fare-breakdown {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 183, 3, 0.3);
+      font-size: 13px;
+    }
+    
+    .fare-breakdown span {
+      color: #aaaaaa;
+    }
+    
+    .fare-breakdown strong {
+      color: #ffffff;
+    }
+    
+    @media (max-width: 968px) {
+      .booking-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      #map {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <div class="back-home">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+  <div class="booking-container">
+    <div class="booking-header" style="text-align: center; margin-bottom: 30px;">
+      <h1><i class="fas fa-map-marked-alt"></i> Book Your Ride with Map</h1>
+      <p>Select pickup and drop locations on the map or enter them manually</p>
+    </div>
+
+    <div class="booking-layout">
+      <!-- Form Panel -->
+      <div class="form-panel">
+        <form id="bookingForm" class="booking-form">
+          <!-- Pickup Location -->
+          <div class="form-group location-input-group">
+            <label for="pickup"><i class="fas fa-circle-dot" style="color: #4caf50;"></i> Pickup Location</label>
+            <div class="input-wrapper">
+              <i class="fas fa-location-dot"></i>
+              <input type="text" id="pickup" name="pickup" placeholder="Enter pickup location or click on map" required autocomplete="off">
+              <button type="button" class="geolocate-btn" onclick="getCurrentLocation()" title="Use current location">
+                <i class="fas fa-crosshairs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Drop Location -->
+          <div class="form-group location-input-group">
+            <label for="drop"><i class="fas fa-square-full" style="color: #f44336;"></i> Drop Location</label>
+            <div class="input-wrapper">
+              <i class="fas fa-location-dot"></i>
+              <input type="text" id="drop" name="drop" placeholder="Enter drop location or click on map" required autocomplete="off">
+            </div>
+          </div>
+
+          <!-- Trip Details -->
+          <div class="trip-details-box" id="tripDetails" style="display: none;">
+            <div class="trip-stat">
+              <i class="fas fa-road"></i>
+              <div>
+                <span class="stat-label">Distance</span>
+                <span class="stat-value" id="distanceValue">0 km</span>
+              </div>
+            </div>
+            <div class="trip-stat">
+              <i class="fas fa-clock"></i>
+              <div>
+                <span class="stat-label">Estimated Time</span>
+                <span class="stat-value" id="durationValue">0 mins</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fare Display -->
+          <div class="fare-display" id="fareDisplay" style="display: none;">
+            <span class="fare-label">Estimated Fare</span>
+            <span class="fare-amount" id="fareAmount">₹0</span>
+            <div class="fare-breakdown">
+              <span>Base: ₹<span id="baseFareBreakdown">0</span></span>
+              <span>Distance: ₹<span id="distanceFareBreakdown">0</span></span>
+              <span>Tax: ₹<span id="taxBreakdown">0</span></span>
+            </div>
+          </div>
+
+          <!-- Ride Type Selection -->
+          <div class="ride-type-section">
+            <label>Select Ride Type</label>
+            <div class="ride-options">
+              <div class="ride-option selected" data-type="auto" data-base-fare="25" data-per-km="8">
+                <div class="ride-icon">
+                  <i class="fas fa-motorcycle"></i>
+                </div>
+                <div class="ride-details">
+                  <h4>Auto Rickshaw</h4>
+                  <p>₹25 base • ₹8/km</p>
+                </div>
+                <div class="ride-radio">
+                  <input type="radio" name="rideType" id="auto" value="auto" checked>
+                  <label for="auto"></label>
+                </div>
+              </div>
+
+              <div class="ride-option" data-type="car" data-base-fare="50" data-per-km="15">
+                <div class="ride-icon">
+                  <i class="fas fa-car"></i>
+                </div>
+                <div class="ride-details">
+                  <h4>Car</h4>
+                  <p>₹50 base • ₹15/km</p>
+                </div>
+                <div class="ride-radio">
+                  <input type="radio" name="rideType" id="car" value="car">
+                  <label for="car"></label>
+                </div>
+              </div>
+
+              <div class="ride-option" data-type="cab" data-base-fare="100" data-per-km="25">
+                <div class="ride-icon">
+                  <i class="fas fa-taxi"></i>
+                </div>
+                <div class="ride-details">
+                  <h4>Premium Cab</h4>
+                  <p>₹100 base • ₹25/km</p>
+                </div>
+                <div class="ride-radio">
+                  <input type="radio" name="rideType" id="cab" value="cab">
+                  <label for="cab"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="booking-actions">
+            <button type="submit" class="btn-primary full-width" id="proceedBtn" disabled>
+              <i class="fas fa-arrow-right"></i> Proceed to Book
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Map Panel -->
+      <div class="map-panel">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+  <script src="script.js"></script>
+  <script src="map-booking.js"></script>
+</body>
+</html>

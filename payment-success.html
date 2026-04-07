@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful - Run A Ride</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <div class="back-home">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+  <div class="booking-container">
+    <div class="success-card">
+      <!-- Success Icon -->
+      <div class="success-icon-wrapper">
+        <div class="success-icon">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <h1>Payment Successful!</h1>
+      <p class="success-subtitle">Your ride has been booked successfully</p>
+
+      <!-- Transaction Details -->
+      <div class="transaction-details">
+        <div class="detail-row">
+          <span>Transaction ID</span>
+          <span id="transactionId" class="mono-font">-</span>
+        </div>
+        <div class="detail-row">
+          <span>Amount Paid</span>
+          <span id="amountPaid" class="highlight">₹0</span>
+        </div>
+        <div class="detail-row">
+          <span>Payment Time</span>
+          <span id="paymentTime">-</span>
+        </div>
+        <div class="detail-row">
+          <span>Payment Method</span>
+          <span id="paymentMethod">-</span>
+        </div>
+      </div>
+
+      <!-- Ride Receipt -->
+      <div class="ride-receipt">
+        <h3><i class="fas fa-receipt"></i> Ride Receipt</h3>
+        
+        <div class="receipt-row">
+          <span class="receipt-label"><i class="fas fa-circle-dot"></i> Pickup:</span>
+          <span class="receipt-value" id="receiptPickup">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label"><i class="fas fa-square-full"></i> Drop:</span>
+          <span class="receipt-value" id="receiptDrop">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label"><i class="fas fa-car-side"></i> Ride Type:</span>
+          <span class="receipt-value" id="receiptRideType">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label"><i class="fas fa-road"></i> Distance:</span>
+          <span class="receipt-value" id="receiptDistance">-</span>
+        </div>
+        <div class="receipt-row total-row">
+          <span class="receipt-label">Total Paid:</span>
+          <span class="receipt-value highlight" id="receiptTotal">₹0</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="success-actions">
+        <button type="button" class="btn-outline full-width" onclick="downloadReceipt()">
+          <i class="fas fa-download"></i> Download Receipt
+        </button>
+        <button type="button" class="btn-primary full-width" onclick="window.location.href='index.html'">
+          <i class="fas fa-home"></i> Go to Home
+        </button>
+      </div>
+
+      <!-- Support Info -->
+      <div class="support-info">
+        <p><i class="fas fa-headset"></i> Need help? Contact support at <a href="mailto:support@runaride.com">support@runaride.com</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Load payment details from URL parameters or localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentData = JSON.parse(localStorage.getItem('lastPayment'));
+      
+      if (paymentData) {
+        // Display transaction details
+        document.getElementById('transactionId').textContent = paymentData.transactionId || 'N/A';
+        document.getElementById('amountPaid').textContent = '₹' + paymentData.amount;
+        document.getElementById('paymentTime').textContent = new Date(paymentData.createdAt).toLocaleString();
+        document.getElementById('paymentMethod').textContent = (paymentData.paymentMethod || 'UPI').toUpperCase();
+        
+        // Display ride receipt
+        if (paymentData.ride) {
+          document.getElementById('receiptPickup').textContent = paymentData.ride.pickupLocation;
+          document.getElementById('receiptDrop').textContent = paymentData.ride.dropLocation;
+          document.getElementById('receiptRideType').textContent = paymentData.ride.rideType.toUpperCase();
+          document.getElementById('receiptDistance').textContent = paymentData.ride.distance + ' km';
+          document.getElementById('receiptTotal').textContent = '₹' + paymentData.amount;
+        }
+      } else if (urlParams.has('payment_id')) {
+        // If coming directly from Razorpay
+        document.getElementById('transactionId').textContent = urlParams.get('payment_id');
+        document.getElementById('amountPaid').textContent = '₹' + (urlParams.get('amount') || '0');
+        document.getElementById('paymentTime').textContent = new Date().toLocaleString();
+      } else {
+        alert('No payment details found');
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Download receipt function
+    function downloadReceipt() {
+      const receiptContent = `
+RUN A RIDE - PAYMENT RECEIPT
+============================
+
+Transaction ID: ${document.getElementById('transactionId').textContent}
+Payment Time: ${document.getElementById('paymentTime').textContent}
+Amount Paid: ${document.getElementById('amountPaid').textContent}
+Payment Method: ${document.getElementById('paymentMethod').textContent}
+
+JOURNEY DETAILS
+---------------
+Pickup: ${document.getElementById('receiptPickup').textContent}
+Drop: ${document.getElementById('receiptDrop').textContent}
+Ride Type: ${document.getElementById('receiptRideType').textContent}
+Distance: ${document.getElementById('receiptDistance').textContent}
+
+Total Paid: ${document.getElementById('receiptTotal').textContent}
+
+Thank you for choosing Run A Ride!
+============================
+      `;
+      
+      const blob = new Blob([receiptContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `receipt_${Date.now()}.txt`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

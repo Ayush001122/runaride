@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment - Run A Ride</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <div class="back-home">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+  <div class="booking-container">
+    <div class="payment-card">
+      <div class="payment-header">
+        <h1><i class="fas fa-credit-card"></i> Complete Payment</h1>
+        <p>Choose your payment method to complete the booking</p>
+      </div>
+
+      <!-- Payment Amount Display -->
+      <div class="payment-amount-box">
+        <span class="amount-label">Total Amount to Pay</span>
+        <span class="amount-value" id="paymentAmount">₹0</span>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div class="payment-methods">
+        <label class="method-label">Select Payment Method</label>
+        
+        <div class="method-option" data-method="upi">
+          <input type="radio" name="paymentMethod" id="method-upi" value="upi" checked>
+          <label for="method-upi">
+            <div class="method-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <div class="method-details">
+              <h4>UPI</h4>
+              <p>Google Pay, PhonePe, Paytm, etc.</p>
+            </div>
+          </label>
+        </div>
+
+        <div class="method-option" data-method="card">
+          <input type="radio" name="paymentMethod" id="method-card" value="card">
+          <label for="method-card">
+            <div class="method-icon">
+              <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="method-details">
+              <h4>Credit / Debit Card</h4>
+              <p>All major cards accepted</p>
+            </div>
+          </label>
+        </div>
+
+        <div class="method-option" data-method="netbanking">
+          <input type="radio" name="paymentMethod" id="method-netbanking" value="netbanking">
+          <label for="method-netbanking">
+            <div class="method-icon">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="method-details">
+              <h4>Net Banking</h4>
+              <p>All major banks supported</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Security Info -->
+      <div class="security-info">
+        <div class="security-item">
+          <i class="fas fa-lock"></i>
+          <span>SSL Encrypted Payment</span>
+        </div>
+        <div class="security-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>100% Secure Transaction</span>
+        </div>
+        <div class="security-item">
+          <i class="fas fa-check-circle"></i>
+          <span>Razorpay Secured</span>
+        </div>
+      </div>
+
+      <!-- Pay Button -->
+      <button type="button" class="btn-primary full-width pay-btn" id="payButton">
+        <i class="fas fa-lock"></i> Pay Now
+      </button>
+
+      <!-- Terms -->
+      <div class="payment-terms">
+        <p>By proceeding, you agree to our <a href="#">Terms of Service</a> and <a href="#">Refund Policy</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="payment.js"></script>
+</body>
+</html>

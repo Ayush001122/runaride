@@ -1,0 +1,40 @@
+{
+  "name": "runaride-backend",
+  "version": "1.0.0",
+  "description": "Run A Ride - Auto Rickshaw Booking Platform Backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "test": "node test-backend.js",
+    "test-api": "node test-backend.js"
+  },
+  "keywords": [
+    "ride-booking",
+    "auto-rickshaw",
+    "razorpay",
+    "payment-gateway"
+  ],
+  "author": "Run A Ride",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/nextjs": "^7.0.8",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "morgan": "^1.10.0",
+    "razorpay": "^2.9.0",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

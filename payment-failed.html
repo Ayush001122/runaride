@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Failed - Run A Ride</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="auth.css">
+  <link rel="stylesheet" href="payment.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Back to Home Button -->
+  <div class="back-home">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+  <div class="booking-container">
+    <div class="failed-card">
+      <!-- Failed Icon -->
+      <div class="failed-icon-wrapper">
+        <div class="failed-icon">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+
+      <!-- Failed Message -->
+      <h1>Payment Failed!</h1>
+      <p class="failed-subtitle">We couldn't process your payment</p>
+
+      <!-- Error Details -->
+      <div class="error-details" id="errorDetails" style="display: none;">
+        <div class="error-box">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Error Reason:</strong>
+            <p id="errorMessage">Unknown error occurred</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction Info -->
+      <div class="transaction-info">
+        <div class="info-row">
+          <span>Transaction ID:</span>
+          <span id="failedTransactionId" class="mono-font">-</span>
+        </div>
+        <div class="info-row">
+          <span>Amount:</span>
+          <span id="failedAmount" class="highlight">₹0</span>
+        </div>
+        <div class="info-row">
+          <span>Time:</span>
+          <span id="failedTime">-</span>
+        </div>
+      </div>
+
+      <!-- Important Notice -->
+      <div class="notice-box">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <strong>Important Notice:</strong>
+          <p>If the amount has been deducted from your account but the payment failed, it will be automatically refunded within 5-7 business days.</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="failed-actions">
+        <button type="button" class="btn-outline full-width" onclick="window.location.href='payment.html'">
+          <i class="fas fa-redo"></i> Retry Payment
+        </button>
+        <button type="button" class="btn-outline full-width" onclick="window.location.href='book-ride.html'">
+          <i class="fas fa-edit"></i> Modify Ride
+        </button>
+        <button type="button" class="btn-primary full-width" onclick="window.location.href='index.html'">
+          <i class="fas fa-home"></i> Go to Home
+        </button>
+      </div>
+
+      <!-- Support Info -->
+      <div class="support-info">
+        <p><i class="fas fa-headset"></i> Need help? Contact our support team</p>
+        <p>Email: <a href="mailto:support@runaride.com">support@runaride.com</a></p>
+        <p>Phone: <a href="tel:+919000000001">+91 90000 00001</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Load payment failure details
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentData = JSON.parse(localStorage.getItem('lastFailedPayment'));
+      
+      if (paymentData) {
+        // Display transaction details
+        document.getElementById('failedTransactionId').textContent = paymentData.transactionId || 'N/A';
+        document.getElementById('failedAmount').textContent = '₹' + (paymentData.amount || '0');
+        document.getElementById('failedTime').textContent = new Date().toLocaleString();
+        
+        // Show error details if available
+        if (paymentData.error) {
+          document.getElementById('errorMessage').textContent = paymentData.error;
+          document.getElementById('errorDetails').style.display = 'block';
+        }
+      } else if (urlParams.has('error')) {
+        // If coming with error parameters
+        document.getElementById('failedTransactionId').textContent = urlParams.get('order_id') || 'N/A';
+        document.getElementById('failedAmount').textContent = '₹' + (urlParams.get('amount') || '0');
+        document.getElementById('failedTime').textContent = new Date().toLocaleString();
+        document.getElementById('errorMessage').textContent = urlParams.get('error') || 'Payment failed';
+        document.getElementById('errorDetails').style.display = 'block';
+      } else {
+        // Default message
+        document.getElementById('failedTime').textContent = new Date().toLocaleString();
+        document.getElementById('errorMessage').textContent = 'The payment could not be processed at this time.';
+        document.getElementById('errorDetails').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
